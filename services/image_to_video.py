@@ -1,31 +1,4 @@
-# Copyright (c) 2025 Stephen G. Pope
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-
-
-import os
-import subprocess
-import logging
-from services.file_management import download_file
-from PIL import Image
-
-STORAGE_PATH = "/tmp/"
-logger = logging.getLogger(__name__)
-
-def process_image_to_video(image_url, length, frame_rate, zoom_speed, job_id, webhook_url=None):
+def process_image_to_video(image_url, length, frame_rate, zoom_speed, job_id, webhook_url=None, output_file=None):
     try:
         # Download the image file
         image_path = download_file(image_url, STORAGE_PATH)
@@ -36,8 +9,9 @@ def process_image_to_video(image_url, length, frame_rate, zoom_speed, job_id, we
             width, height = img.size
         logger.info(f"Original image dimensions: {width}x{height}")
 
-        # Prepare the output path
-        output_path = os.path.join(STORAGE_PATH, f"{job_id}.mp4")
+        # Use custom output filename if provided
+        output_filename = output_file if output_file else f"{job_id}.mp4"
+        output_path = os.path.join(STORAGE_PATH, output_filename)
 
         # Determine orientation and set appropriate dimensions
         if width > height:
@@ -54,6 +28,7 @@ def process_image_to_video(image_url, length, frame_rate, zoom_speed, job_id, we
         logger.info(f"Using scale dimensions: {scale_dims}, output dimensions: {output_dims}")
         logger.info(f"Video length: {length}s, Frame rate: {frame_rate}fps, Total frames: {total_frames}")
         logger.info(f"Zoom speed: {zoom_speed}/s, Final zoom factor: {zoom_factor}")
+        logger.info(f"Output path: {output_path}")
 
         # Prepare FFmpeg command
         cmd = [
