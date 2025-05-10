@@ -25,7 +25,7 @@ from PIL import Image
 STORAGE_PATH = "/tmp/"
 logger = logging.getLogger(__name__)
 
-def process_image_to_video(image_url, length, frame_rate, zoom_speed, job_id, webhook_url=None):
+def process_image_to_video(image_url, length, frame_rate, zoom_speed, job_id, webhook_url=None, output_file=None):
     try:
         # Download the image file
         image_path = download_file(image_url, STORAGE_PATH)
@@ -36,8 +36,9 @@ def process_image_to_video(image_url, length, frame_rate, zoom_speed, job_id, we
             width, height = img.size
         logger.info(f"Original image dimensions: {width}x{height}")
 
-        # Prepare the output path
-        output_path = os.path.join(STORAGE_PATH, f"{job_id}.mp4")
+        # Use custom output filename if provided
+        output_filename = output_file if output_file else f"{job_id}.mp4"
+        output_path = os.path.join(STORAGE_PATH, output_filename)
 
         # Determine orientation and set appropriate dimensions
         if width > height:
@@ -54,6 +55,7 @@ def process_image_to_video(image_url, length, frame_rate, zoom_speed, job_id, we
         logger.info(f"Using scale dimensions: {scale_dims}, output dimensions: {output_dims}")
         logger.info(f"Video length: {length}s, Frame rate: {frame_rate}fps, Total frames: {total_frames}")
         logger.info(f"Zoom speed: {zoom_speed}/s, Final zoom factor: {zoom_factor}")
+        logger.info(f"Output path: {output_path}")
 
         # Prepare FFmpeg command
         cmd = [
