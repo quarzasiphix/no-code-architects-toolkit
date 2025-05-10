@@ -35,8 +35,9 @@ def process_image_to_video(image_url, length, frame_rate, zoom_speed, job_id, we
             width, height = img.size
         logger.info(f"Original image dimensions: {width}x{height}")
 
-        # Prepare the output path
-        output_path = os.path.join(LOCAL_STORAGE_PATH, f"{job_id}.mp4")
+        # Use custom output filename if provided
+        output_filename = output_file if output_file else f"{job_id}.mp4"
+        output_path = os.path.join(STORAGE_PATH, output_filename)
 
         # Determine orientation and set appropriate dimensions
         if width > height:
